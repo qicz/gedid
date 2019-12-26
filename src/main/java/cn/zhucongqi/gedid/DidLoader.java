@@ -17,23 +17,25 @@ package cn.zhucongqi.gedid;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-import cn.zhucongqi.gedid.core.Gedid;
+import cn.zhucongqi.gedid.core.DidGenerator;
+import cn.zhucongqi.gedid.core.IGedidConfig;
+import cn.zhucongqi.gedid.core.redis.GedidConfig;
 import cn.zhucongqi.gedid.kit.StrKit;
 
 public class GedidLoader {
 	
 	/**
-	 * Gedid Config
+	 * DidGenerator Config
 	 */
-	private GedidConfig config;
+	private IGedidConfig config;
 	
 	/**
 	 * Business Mapping
 	 */
-	private ConcurrentHashMap<String, Gedid> bisMapping;
+	private ConcurrentHashMap<String, DidGenerator> bisMapping;
 	
 	/**
-	 * Init Gedid Loader
+	 * Init DidGenerator Loader
 	 * @param config
 	 * @return loader instance
 	 */
@@ -44,9 +46,9 @@ public class GedidLoader {
 	/**
 	 * Follow Business.
 	 * @param bisName
-	 * @return Gedid instance.
+	 * @return DidGenerator instance.
 	 */
-	public Gedid follow(String bisName) {
+	public DidGenerator follow(String bisName) {
 		if (StrKit.isBlank(bisName)) {
 			throw (new GedidException("The bisname cannot be Empty."));
 		}
@@ -54,9 +56,9 @@ public class GedidLoader {
 		if (this.bisMapping.containsKey(bisName)) {
 			return this.bisMapping.get(bisName);
 		}
-		Gedid gedid = new Gedid(bisName, this.config);
-		this.bisMapping.put(bisName, gedid);
-		return gedid;
+		DidGenerator didGenerator = new DidGenerator(bisName, this.config);
+		this.bisMapping.put(bisName, didGenerator);
+		return didGenerator;
 	}
 	
 	private GedidLoader(GedidConfig config) {
@@ -71,7 +73,7 @@ public class GedidLoader {
 		}
 		
 		this.config = config;
-		this.bisMapping = new ConcurrentHashMap<String, Gedid>();
+		this.bisMapping = new ConcurrentHashMap<String, DidGenerator>();
 	}
 
 }

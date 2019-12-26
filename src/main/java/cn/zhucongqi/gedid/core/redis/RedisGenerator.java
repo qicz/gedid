@@ -13,16 +13,17 @@
  * License for the specific language governing permissions and limitations under
  * the License.
 */
-package cn.zhucongqi.gedid.core.dc.impl;
+package cn.zhucongqi.gedid.core.redis;
 
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import cn.zhucongqi.gedid.GedidConfig;
-import cn.zhucongqi.gedid.core.dc.GedidDC;
+import cn.zhucongqi.gedid.core.GeneratorConfig;
+import cn.zhucongqi.gedid.core.IGenerator;
+import cn.zhucongqi.gedid.kit.StrKit;
 import redis.clients.jedis.Jedis;
 
-public class RedisDC implements GedidDC {
+public class RedisIGenerator implements IGenerator {
 
 	/**
 	 * Jedis client.
@@ -37,20 +38,20 @@ public class RedisDC implements GedidDC {
 	/**
 	 * Start Id
 	 */
-	private Integer startId;
+	private Long startId;
 	
 	/**
 	 * Resources lock.
 	 */
 	private final Lock lock;
 	
-	public RedisDC(GedidConfig config) {
-		this.jedis = new Jedis(config.getIp(), config.getPort());
-		String auth = config.getAuth();
-		if (null != auth && !"".equals(auth.trim())) {
+	public RedisIGenerator(GeneratorConfig iConfig) {
+		this.jedis = new Jedis(iConfig.getIp(), iConfig.getPort());
+		String auth = iConfig.getAuth();
+		if (StrKit.notBlank(auth)) {
 			this.jedis.auth(auth);
 		}
-		this.startId = config.getStartId();
+		this.startId = iConfig.getStartId();
 		this.lock = new ReentrantLock();
 	}
 
@@ -59,7 +60,7 @@ public class RedisDC implements GedidDC {
 		this.name = name;
 		this.lock.lock();
 		try {
-			// if the key (this.name) cannot be exist, create and set the value with `this.startId - 1`.<br/>
+			// if the key (this.name) cannot exist, create and set the value with `this.startId - 1`.<br/>
 			// if the key (this.name) is existed , no operation is performed.
 			this.jedis.setnx(this.name, String.valueOf((this.startId - 1)));
 		} finally {
@@ -69,7 +70,7 @@ public class RedisDC implements GedidDC {
 	}
 
 	@Override
-	public Long incr() {
+	public Long next() {
 		this.lock.lock();
 		long nextId = 0L;
 		try {

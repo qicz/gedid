@@ -13,21 +13,35 @@
  * License for the specific language governing permissions and limitations under
  * the License.
 */
-package cn.zhucongqi.gedid.core.dc;
+package cn.zhucongqi.gedid.core;
 
-public interface GedidDC {
+import cn.zhucongqi.gedid.core.redis.GedidConfig;
+import cn.zhucongqi.gedid.core.dc.GedidDC;
+import cn.zhucongqi.gedid.core.dc.impl.RedisDC;
+
+public class Gedid {
 	
+	private final static String GEDID_PREFIX = "gedid_";
+
 	/**
-	 * Follow The business with name.
-	 * @param name
-	 * @return true, follow success.
+	 * Data Center
 	 */
-	boolean follow(String name);
+	private GedidDC dc;
 	
+	public Gedid(String name, IGedidConfig config) {
+		this.dc = new RedisDC(config);
+		this.dc.follow(this.getName(name));
+	}
+
 	/**
-	 * Increment id.
-	 * @return
+	 * Get next Id.
 	 */
-	Long incr();
+	public long next() {
+		return this.dc.incr();
+	}
+	
+	private String getName(String name) {
+		return GEDID_PREFIX + name;
+	}
 	
 }

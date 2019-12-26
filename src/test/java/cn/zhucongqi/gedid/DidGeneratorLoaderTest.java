@@ -15,6 +15,7 @@
 */
 package cn.zhucongqi.gedid;
 
+import cn.zhucongqi.gedid.core.redis.GedidConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

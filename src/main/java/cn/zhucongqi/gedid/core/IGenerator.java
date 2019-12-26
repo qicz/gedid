@@ -15,33 +15,19 @@
 */
 package cn.zhucongqi.gedid.core;
 
-import cn.zhucongqi.gedid.GedidConfig;
-import cn.zhucongqi.gedid.core.dc.GedidDC;
-import cn.zhucongqi.gedid.core.dc.impl.RedisDC;
-
-public class Gedid {
+public interface IdGenerator {
 	
-	private final static String GEDID_PREFIX = "gedid_";
-
 	/**
-	 * Data Center
+	 * Follow The business with name.
+	 * @param name
+	 * @return true, follow success.
 	 */
-	private GedidDC dc;
+	boolean follow(String name);
 	
-	public Gedid(String name, GedidConfig config) {
-		this.dc = new RedisDC(config);
-		this.dc.follow(this.getName(name));
-	}
-
 	/**
-	 * Get next Id.
+	 * Next id.
+	 * @return
 	 */
-	public long next() {
-		return this.dc.incr();
-	}
-	
-	private String getName(String name) {
-		return GEDID_PREFIX + name;
-	}
+	Long next();
 	
 }
