@@ -15,7 +15,7 @@
 */
 package cn.zhucongqi.gedid.core;
 
-public interface IdGenerator {
+public interface IGenerator {
 	
 	/**
 	 * Follow The business with name.
@@ -23,6 +23,12 @@ public interface IdGenerator {
 	 * @return true, follow success.
 	 */
 	boolean follow(String name);
+
+	/**
+	 * Current id.
+	 * @return
+	 */
+	Long current();
 	
 	/**
 	 * Next id.

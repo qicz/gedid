@@ -8,7 +8,7 @@ package cn.zhucongqi.gedid.core;
  * @modified By：
  * @version:
  */
-public abstract class AbstractConfig implements IConfig {
+public class GeneratorConfig {
 
     /**
      * DC Server Ip
@@ -37,10 +37,25 @@ public abstract class AbstractConfig implements IConfig {
         Zookeeper;
     }
 
-    public AbstractConfig(String ip, Integer port, String auth, Long startId, Type type) {
+    public static GeneratorConfig defaultRedisConfig() {
+        return (new GeneratorConfig("127.0.0.1", 6379, "", 1L, Type.Redis));
+    }
+
+    public static GeneratorConfig defaultZookeeperConfig() {
+        return (new GeneratorConfig("127.0.0.1", 2181, "", 1L, Type.Zookeeper));
+    }
+
+    public GeneratorConfig(String ip, Integer port, String auth, Long startId, Type type) {
         this.ip = ip;
         this.port = port;
         this.auth = auth;
+        this.startId = startId;
+        this.type = type;
+    }
+
+    public GeneratorConfig(String ip, Integer port, Long startId, Type type) {
+        this.ip = ip;
+        this.port = port;
         this.startId = startId;
         this.type = type;
     }

@@ -15,33 +15,57 @@
 */
 package cn.zhucongqi.gedid.core;
 
-import cn.zhucongqi.gedid.core.redis.GedidConfig;
-import cn.zhucongqi.gedid.core.dc.GedidDC;
-import cn.zhucongqi.gedid.core.dc.impl.RedisDC;
+import cn.zhucongqi.gedid.core.redis.RedisGenerator;
+import cn.zhucongqi.gedid.core.zookeeper.ZookeeperGenerator;
 
-public class Gedid {
+public class DidGenerator implements IGenerator {
 	
-	private final static String GEDID_PREFIX = "gedid_";
+	private final static String DID_PREFIX = "did_";
 
 	/**
 	 * Data Center
 	 */
-	private GedidDC dc;
+	private IGenerator iGenerator;
 	
-	public Gedid(String name, IGedidConfig config) {
-		this.dc = new RedisDC(config);
-		this.dc.follow(this.getName(name));
+	public DidGenerator(GeneratorConfig config) {
+		if (GeneratorConfig.Type.Redis.equals(config.getType())) {
+			this.iGenerator = new RedisGenerator(config);
+		} else {
+			this.iGenerator = new ZookeeperGenerator(config);
+		}
+	}
+
+	/**
+	 * Follow The business with name.
+	 *
+	 * @param name
+	 * @return true, follow success.
+	 */
+	@Override
+	public boolean follow(String name) {
+		this.iGenerator.follow(this.getName(name));
+		return true;
+	}
+
+	/**
+	 * Current id.
+	 * @return
+	 */
+	@Override
+	public Long current() {
+		return this.iGenerator.current();
 	}
 
 	/**
 	 * Get next Id.
 	 */
-	public long next() {
-		return this.dc.incr();
+	@Override
+	public Long next() {
+		return this.iGenerator.next();
 	}
 	
 	private String getName(String name) {
-		return GEDID_PREFIX + name;
+		return DID_PREFIX + name;
 	}
 	
 }

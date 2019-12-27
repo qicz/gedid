@@ -15,11 +15,11 @@
 */
 package cn.zhucongqi.gedid;
 
-public class GedidException extends RuntimeException {
+public class DidException extends IllegalArgumentException {
 
 	private static final long serialVersionUID = -4347848822568416261L;
 	
-	public GedidException(String message) {
+	public DidException(String message) {
 		super(message);
 	}
 	

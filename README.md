@@ -1,5 +1,5 @@
 # Gedid 
-The Generate distributed id system.
+Distributed id generator.
 
 ![maven](https://img.shields.io/maven-central/v/cn.zhucongqi/gedid.svg)
 
@@ -11,25 +11,31 @@ The Generate distributed id system.
 
 # How to use?
 
-- Step 1: init GedidLoader
+- Step 1: init DidLoader
 
 ```java
-GedidLoader loader = GedidLoader.init(GedidConfig.defaultConfig());
+DidLoader loader = DidLoader.init(GeneratorConfig.defaultRedisConfig());
 ```
 
 - Step2: follow business with name
 
 ```java
-Gedid user = loader.follow("user");
+DidGenerator user = loader.follow("user");
 ```
 
 - Step3: get business id
 
 ```java
-Long id = user.next();
+Long currentId = user.current();
+Long nextId = user.next();
 ```
 
+or
 
+```java
+Long currentId = loader.current("user");
+Long nextId = loader.next("user");
+```
 
 # TODO
 

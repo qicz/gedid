@@ -23,7 +23,7 @@ import cn.zhucongqi.gedid.core.IGenerator;
 import cn.zhucongqi.gedid.kit.StrKit;
 import redis.clients.jedis.Jedis;
 
-public class RedisIGenerator implements IGenerator {
+public class RedisGenerator implements IGenerator {
 
 	/**
 	 * Jedis client.
@@ -45,7 +45,7 @@ public class RedisIGenerator implements IGenerator {
 	 */
 	private final Lock lock;
 	
-	public RedisIGenerator(GeneratorConfig iConfig) {
+	public RedisGenerator(GeneratorConfig iConfig) {
 		this.jedis = new Jedis(iConfig.getIp(), iConfig.getPort());
 		String auth = iConfig.getAuth();
 		if (StrKit.notBlank(auth)) {
@@ -67,6 +67,16 @@ public class RedisIGenerator implements IGenerator {
 			this.lock.unlock();
 		}
 		return true;
+	}
+
+	/**
+	 * Current id.
+	 *
+	 * @return
+	 */
+	@Override
+	public Long current() {
+		return Long.valueOf(this.jedis.get(this.name));
 	}
 
 	@Override

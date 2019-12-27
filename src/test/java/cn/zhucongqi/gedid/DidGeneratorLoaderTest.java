@@ -15,54 +15,52 @@
 */
 package cn.zhucongqi.gedid;
 
-import cn.zhucongqi.gedid.core.redis.GedidConfig;
+import cn.zhucongqi.gedid.core.GeneratorConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import cn.zhucongqi.gedid.core.Gedid;
+import cn.zhucongqi.gedid.core.DidGenerator;
 
-class GedidLoaderTest {
+class DidGeneratorLoaderTest {
 
-	GedidLoader loader;
+	DidLoader loader;
 	
 	@BeforeEach
 	void setUp() throws Exception {
-		loader = GedidLoader.init(GedidConfig.defaultConfig());
+		loader = DidLoader.init(GeneratorConfig.defaultRedisConfig());
 	}
 
 	@Test
 	void test() {
-		Gedid user = loader.follow("user");
+		DidGenerator user = loader.follow("user");
 		
-		Long id = user.next();
-		System.out.println(id);
+		Long id = user.current();
+		System.out.println("start user id =>"+id + "loader.current =>"+loader.current("user"));
 		
-		Gedid order = loader.follow("order");
+		DidGenerator order = loader.follow("order");
 		
-		id = order.next();
-		System.out.println(id);
+		id = order.current();
+		System.out.println("start order id =>"+id + "loader.current =>"+loader.current("order"));
 		
 		new Thread() {
 			public void run() {
 				for (int j = 0; j < 10; j++) {
-					GedidLoader loader = GedidLoader.init(GedidConfig.defaultConfig());
-					Gedid user = loader.follow("user");
-					
+					DidGenerator user = loader.follow("user");
+
 					Long id = user.next();
-					System.out.println("A"+id+"j= "+j);
+					System.out.println(Thread.currentThread().getName()+"> user id=>"+id);
 				}
 			}
-			
+
 		}.start();
 		
 		new Thread() {
 			public void run() {
 				for (int j = 0; j < 10; j++) {
-					GedidLoader loader = GedidLoader.init(GedidConfig.defaultConfig());
-					Gedid user = loader.follow("user");
+					DidGenerator user = loader.follow("order");
 					
 					Long id = user.next();
-					System.out.println("B"+id+"j= "+j);
+					System.out.println(Thread.currentThread().getName()+"> order id=>"+id);
 				}
 			}
 			

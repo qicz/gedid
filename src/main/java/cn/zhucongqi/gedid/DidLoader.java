@@ -18,62 +18,103 @@ package cn.zhucongqi.gedid;
 import java.util.concurrent.ConcurrentHashMap;
 
 import cn.zhucongqi.gedid.core.DidGenerator;
-import cn.zhucongqi.gedid.core.IGedidConfig;
-import cn.zhucongqi.gedid.core.redis.GedidConfig;
+import cn.zhucongqi.gedid.core.GeneratorConfig;
 import cn.zhucongqi.gedid.kit.StrKit;
 
-public class GedidLoader {
+public class DidLoader {
 	
 	/**
-	 * DidGenerator Config
+	 * DidGenerator generatorConfig
 	 */
-	private IGedidConfig config;
+	private GeneratorConfig generatorConfig;
 	
 	/**
 	 * Business Mapping
 	 */
-	private ConcurrentHashMap<String, DidGenerator> bisMapping;
+	private ConcurrentHashMap<String, DidGenerator> businessMapping;
 	
 	/**
-	 * Init DidGenerator Loader
-	 * @param config
+	 * Init DidGenerator Loader using Redis
+	 * @param generatorConfig
 	 * @return loader instance
 	 */
-	public static GedidLoader init(GedidConfig config) {
-		return (new GedidLoader(config));
+	public static DidLoader init(GeneratorConfig generatorConfig) {
+		return (new DidLoader(generatorConfig));
 	}
-	
+
 	/**
 	 * Follow Business.
-	 * @param bisName
+	 * @param businessName
 	 * @return DidGenerator instance.
 	 */
-	public DidGenerator follow(String bisName) {
-		if (StrKit.isBlank(bisName)) {
-			throw (new GedidException("The bisname cannot be Empty."));
+	public DidGenerator follow(String businessName) {
+		if (StrKit.isBlank(businessName)) {
+			throw (new DidException("The businessName cannot be Empty."));
 		}
 		
-		if (this.bisMapping.containsKey(bisName)) {
-			return this.bisMapping.get(bisName);
+		if (this.businessMapping.containsKey(businessName)) {
+			return this.businessMapping.get(businessName);
 		}
-		DidGenerator didGenerator = new DidGenerator(bisName, this.config);
-		this.bisMapping.put(bisName, didGenerator);
+
+		DidGenerator didGenerator = new DidGenerator(this.generatorConfig);
+		didGenerator.follow(businessName);
+
+		this.businessMapping.put(businessName, didGenerator);
+
 		return didGenerator;
 	}
+
+	/**
+	 * the `businessName`'s current id.
+	 * @param businessName
+	 * @return if not found return -1L
+	 */
+	public Long current(String businessName) {
+		if (StrKit.isBlank(businessName)) {
+			throw (new DidException("The businessName cannot be Empty."));
+		}
+
+		if (this.businessMapping.containsKey(businessName)) {
+			return this.businessMapping.get(businessName).current();
+		}
+		return -1L;
+	}
+
+	/**
+	 * the `businessName`'s next id.
+	 * @param businessName
+	 * @return if not found return -1L
+	 */
+	public Long next(String businessName) {
+		if (StrKit.isBlank(businessName)) {
+			throw (new DidException("The businessName cannot be Empty."));
+		}
+		if (this.businessMapping.containsKey(businessName)) {
+			return this.businessMapping.get(businessName).next();
+		}
+		return -1L;
+	}
+
+	private DidLoader() {
+		;
+	}
 	
-	private GedidLoader(GedidConfig config) {
-		if (null == config) {
-			throw (new GedidException("The config cannot be null."));
+	private DidLoader(GeneratorConfig generatorConfig) {
+		if (null == generatorConfig) {
+			throw (new DidException("The generatorConfig cannot be null."));
 		}
-		if (StrKit.isBlank(config.getIp())) {
-			throw (new GedidException("The config's ip cannot be null."));
+
+		if (StrKit.isBlank(generatorConfig.getIp())) {
+			throw (new DidException("The generatorConfig's ip cannot be null."));
 		}
-		if (0 == config.getPort()) {
-			throw (new GedidException("Set the config's port."));
+
+		if (0 == generatorConfig.getPort()) {
+			throw (new DidException("Set the generatorConfig's port."));
 		}
 		
-		this.config = config;
-		this.bisMapping = new ConcurrentHashMap<String, DidGenerator>();
+		this.generatorConfig = generatorConfig;
+
+		this.businessMapping = new ConcurrentHashMap<String, DidGenerator>();
 	}
 
 }

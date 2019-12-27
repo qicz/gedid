@@ -1,8 +1,7 @@
 package cn.zhucongqi.gedid.core.zookeeper;
 
 import cn.zhucongqi.gedid.core.GeneratorConfig;
-import cn.zhucongqi.gedid.core.IConfig;
-import cn.zhucongqi.gedid.core.IdGenerator;
+import cn.zhucongqi.gedid.core.IGenerator;
 
 /**
  * @author ：Jobsz
@@ -12,9 +11,9 @@ import cn.zhucongqi.gedid.core.IdGenerator;
  * @modified By：
  * @version:
  */
-public class ZookeeperIDGenerator implements IdGenerator {
+public class ZookeeperGenerator implements IGenerator {
 
-    public ZookeeperIDGenerator(GeneratorConfig generatorConfig) {
+    public ZookeeperGenerator(GeneratorConfig generatorConfig) {
 
     }
 
@@ -27,6 +26,16 @@ public class ZookeeperIDGenerator implements IdGenerator {
     @Override
     public boolean follow(String name) {
         return false;
+    }
+
+    /**
+     * Current id.
+     *
+     * @return
+     */
+    @Override
+    public Long current() {
+        return null;
     }
 
     /**
